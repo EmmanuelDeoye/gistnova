@@ -1,0 +1,358 @@
+/* --- Variables & Theme Setup --- */
+:root {
+    /* Light Mode (Default) */
+    --primary-color: #009688; /* Teal */
+    --primary-hover: #00796b;
+    --bg-color: #f4f6f8; /* Light background for the overall page */
+    --card-bg: #ffffff; /* White background for the form/table */
+    --text-main: #333333;
+    --text-muted: #666666;
+    --border-color: #ddd;
+}
+
+[data-theme="dark"] {
+    /* Dark Mode Overrides */
+    --primary-color: #26a69a; /* Lighter Teal */
+    --primary-hover: #4db6ac;
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-main: #e0e0e0;
+    --text-muted: #a0a0a0;
+    --border-color: #333333;
+}
+
+/* --- Base Reset --- */
+* {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    min-height: 100vh;
+}
+
+/* --- Login Overlay --- */
+.login-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #263238; /* Dark Slate */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    /* transition is important for smooth removal */
+    transition: opacity 0.3s ease; 
+}
+
+.login-box {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    width: 90%;
+    max-width: 350px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.icon-lock {
+    font-size: 2rem; color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.login-box h2 { color: var(--text-main); }
+.login-box p { color: var(--text-muted); }
+
+.login-box input {
+    width: 100%; padding: 12px; margin: 15px 0;
+    border: 1px solid var(--border-color); border-radius: 6px;
+    text-align: center; font-size: 1.1rem;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+}
+
+.login-box button {
+    width: 100%; padding: 12px;
+    background-color: var(--primary-color);
+    color: white; border: none; border-radius: 6px;
+    cursor: pointer; font-weight: 600;
+}
+
+.error-text { color: #f44336; font-size: 0.85rem; margin-top: 10px; }
+
+/* --- Admin Panel Layout --- */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.highlight { color: var(--primary-color); }
+
+.view-site-btn {
+    text-decoration: none;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    margin-bottom: 25px;
+    color: var(--text-main);
+    padding-top: 10px;
+}
+
+/* --- Tabs for Navigation --- */
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border-color);
+    overflow-x: auto; /* Allow horizontal scrolling on small screens */
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px; 
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    color: var(--primary-color);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+
+/* --- Form Styles --- */
+.blog-form {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.form-group { margin-bottom: 20px; }
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+.half { flex: 1; }
+
+label {
+    display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 8px;
+}
+
+input[type="text"], select, textarea {
+    width: 100%; padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px; font-size: 0.95rem;
+    background: var(--bg-color);
+    color: var(--text-main);
+}
+
+input:focus, textarea:focus {
+    outline: none; border-color: var(--primary-color);
+    background: var(--card-bg);
+}
+
+/* File Upload */
+.file-upload-wrapper {
+    position: relative;
+    overflow: hidden;
+    border: 1px dashed var(--primary-color);
+    background: var(--bg-color);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    color: var(--text-main);
+}
+
+.file-upload-wrapper input[type="file"] {
+    position: absolute;
+    left: 0; top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.progress-bar {
+    height: 4px; background: var(--border-color); margin-top: 5px;
+    border-radius: 2px; overflow: hidden;
+}
+.progress-fill {
+    height: 100%; width: 0%; background: var(--primary-color);
+    transition: width 0.3s;
+}
+
+/* Formatting Guide */
+.label-row { display: flex; justify-content: space-between; }
+.help-btn {
+    background: none; border: none; color: var(--primary-color);
+    cursor: pointer; font-size: 0.8rem; text-decoration: underline;
+}
+.formatting-box {
+    display: none; background: var(--bg-color); padding: 10px;
+    font-size: 0.85rem; border: 1px solid var(--border-color);
+    margin-bottom: 10px; border-radius: 6px;
+    color: var(--text-muted);
+}
+.formatting-box strong { color: var(--primary-color); }
+
+
+/* Submit Button */
+.submit-btn {
+    width: 100%; padding: 15px;
+    background-color: var(--primary-color);
+    color: white; border: none; border-radius: 8px;
+    font-size: 1.1rem; cursor: pointer; font-weight: 700;
+    transition: transform 0.2s;
+}
+
+.submit-btn:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 5px 15px rgba(0,150,136,0.3); 
+}
+
+/* Edit Mode Styling */
+#blog-form.edit-mode #submit-btn {
+    background-color: #ff9800; /* Orange for edit */
+}
+
+
+/* --- Posts Table Management --- */
+.post-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.post-table th, .post-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9rem;
+}
+
+.post-table th {
+    background-color: var(--bg-color);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.post-table tr:hover {
+    background-color: var(--bg-color);
+}
+
+/* Post Image Styling */
+.post-image {
+    width: 60px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    vertical-align: middle;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    margin-right: 10px;
+    padding: 5px;
+    font-size: 1rem;
+    transition: opacity 0.2s;
+}
+
+.action-btn:hover {
+    opacity: 0.7;
+}
+
+.delete-btn {
+    color: #f44336; /* Red for delete */
+}
+
+/* --- Mobile Responsiveness for Table (768px and below) --- */
+@media screen and (max-width: 768px) {
+    
+    /* Hide table headers on mobile */
+    .post-table thead {
+        border: none;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+
+    /* Make each row a distinct block */
+    .post-table tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    /* Restyle table cells for vertical layout */
+    .post-table td {
+        display: grid; 
+        /* Label takes 30%, Value takes 70% */
+        grid-template-columns: 35% 65%; 
+        border-bottom: 1px solid var(--border-color);
+        text-align: right;
+        padding: 10px 15px;
+        background: var(--card-bg); /* Ensure cell background is clean */
+    }
+    
+    .post-table td:before {
+        /* Displays the data-label value as a label */
+        content: attr(data-label);
+        float: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        text-align: left;
+    }
+
+    /* Actions row needs special handling to be centered/grouped */
+    .post-table td:last-child {
+        text-align: center;
+        border-bottom: none;
+        grid-template-columns: 1fr; /* Single column layout for actions */
+        padding-top: 15px;
+    }
+    
+    /* Mobile Form Adjustments */
+    .form-row { flex-direction: column; gap: 0; }
+    .admin-header h1 { font-size: 1.5rem; }
+}
