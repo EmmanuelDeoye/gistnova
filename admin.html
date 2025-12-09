@@ -54,6 +54,104 @@
                             <option value="Entertainment">Entertainment</option>
                             <option value="Politics">Politics</option>
                             <option value="Tech">Tech</option>
+                            <option value="TV/Media">TV/Media</option>
+                            <option value="Lifestyle">Lifestyle</option>
+                            <option value="Sports">Sports</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group half">
+                        <label>Cover Image</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="image-file" accept="image/*">
+                            <span id="upload-status">Select Image</span>
+                        </div>
+                        <input type="hidden" id="final-image-url"> 
+                        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+                    </div>
+                </div>
+    
+                <div class="form-group">
+                    <label>Short Description</label>
+                    <textarea id="post-desc" rows="3" placeholder="A brief summary for the home page..." required></textarea>
+                </div>
+    
+                <div class="form-group">
+                    <div class="label-row">
+                        <label>Main Content</label>
+                        <button type="button" class="help-btn" onclick="toggleHelp()">Formatting Guide?</button>
+                    </div>
+                    
+                    <div id="formatting-guide" class="formatting-box">
+                        <p><strong>*text*</strong> = <strong>Bold</strong></p>
+                        <p><strong>#text#</strong> = <em>Italic</em></p>
+                        <p><strong>%text%</strong> = Quote Block</p>
+                        <p><strong>{img:url}</strong> = Inline Image</p>
+                    </div>
+    
+                    <textarea id="post-content" rows="12" placeholder="Write the full gist here... Use *bold* for emphasis." required></textarea>
+                </div>
+    
+                <button type="submit" id="submit-btn" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Publish Gist
+                </button>
+    
+            </form>
+        </div>
+        
+        <div id="manage-posts" class="content-section" style="display: none;">
+            <h2 class="section-title">Manage Existing Posts</h2>
+            <div id="posts-table-container">
+                <p id="loading-posts">Loading posts...</p>
+                <table class="post-table" id="posts-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Date</th>
+                            <th>Views</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="posts-tbody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <script src="assets/js/configuration.js"></script>
+    <script src="assets/js/admin.js"></script>
+
+</body>
+</html>
+
+        <div id="create-post" class="content-section active">
+            <h2 class="section-title">Post a New Article</h2>
+            
+            <form id="blog-form" class="blog-form">
+                
+                <input type="hidden" id="post-id-to-edit" value="">
+                
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="post-title" placeholder="Catchy Headline..." required>
+                </div>
+    
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>Category</label>
+                        <select id="post-category">
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Politics">Politics</option>
+                            <option value="Tech">Tech</option>
                             <option value="Lifestyle">Lifestyle</option>
                             <option value="Sports">Sports</option>
                         </select>
