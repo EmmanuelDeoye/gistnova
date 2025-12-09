@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Gist | GistNova</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="assets/css/fullgist.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="index.html" class="logo">Gist<span class="highlight">Nova</span>.</a>
+            <div class="nav-controls">
+                <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+                <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+        <main class="container article-container">
+        
+        <div id="loader" class="loader-container">
+            <div class="spinner"></div>
+        </div>
+
+        <article id="article-view" class="article-content" style="display: none;">
+            
+            <header class="article-header">
+                <span id="gist-category" class="category-tag">Category</span>
+                <h1 id="gist-title">Loading...</h1>
+                
+                <div class="article-meta-row">
+                    <span><i class="far fa-calendar-alt"></i> <span id="gist-date">...</span></span>
+                    <button id="share-btn" class="share-btn">
+                        <i class="fas fa-share-alt"></i> Share Gist
+                    </button>
+                </div>
+            </header>
+
+            <div class="article-image-wrapper">
+                <img id="gist-image" src="" alt="Blog Cover Image">
+            </div>
+
+            <div class="article-body">
+                <p id="gist-desc" class="lead-text"></p>
+                <hr class="divider">
+                <div id="gist-content" class="main-text"></div>
+            </div>
+
+        </article>
+
+        <section id="related-section" class="related-section" style="display: none;">
+            <h3 class="related-heading">More from <span id="related-cat-name">this category</span></h3>
+            <div id="related-grid" class="related-grid">
+                </div>
+        </section>
+
+    </main>
+
+
+    <footer>
+        <p>&copy; 2025 GistNova. All rights reserved.</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+
+
+    <script src="assets/js/configuration.js"></script>
+    <script src="assets/js/fullgist.js"></script>
+</body>
+</html>

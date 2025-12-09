@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gistnova | Trending Gist</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="assets/css/home.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <h1 class="logo">Gist<span class="highlight">Nova</span>.</h1>
+            <div class="nav-controls">
+                <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <h2>Hot & Trending</h2>
+            <p>Catch the latest gist as it drops.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <section class="filter-section">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Search gist...">
+            </div>
+            
+            <div class="filter-controls">
+                <select id="category-filter">
+                    <option value="all">All Categories</option>
+                    </select>
+                
+                <select id="sort-filter">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                </select>
+            </div>
+        </section>
+        
+        <div id="loader" class="loader-container">
+            <div class="spinner"></div>
+        </div>
+
+        <div id="blog-grid" class="blog-grid">
+            </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container footer-content">
+            
+            <div class="footer-col brand-col">
+                <h2 class="footer-logo">Gist<span class="highlight">Nova</span>.</h2>
+                <p>Your daily dose of trending gist, served hot and fresh. Stay connected with the vibe.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col links-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#" id="open-about">About Us</a></li>
+                    <li><a href="#" id="open-terms">Terms & Policies</a></li>
+                    <li><a href="mailto:gistnova@gmail.com">Contact Support</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col newsletter-col">
+                <h3>Subscribe</h3>
+                <p>Get the latest gist sent directly to your inbox.</p>
+                <form id="newsletter-form" class="newsletter-form">
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit" class="btn-subscribe">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 Gistnova. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="modal-about" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>About GistNova</h2>
+            <div class="modal-body">
+                <p>Welcome to <strong>GistNova</strong>, the heartbeat of trending stories.</p>
+                <p>We are dedicated to bringing you the most captivating, authentic, and timely stories from around the globe. Whether it's entertainment, lifestyle, or tech, GistNova is your number one source.</p>
+                <p>Founded in 2025, our mission is to keep you informed and entertained with content that matters.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-terms" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Terms & Policies</h2>
+            <div class="modal-body">
+                <h3>1. Terms of Service (ToS)</h3>
+                <p>By accessing the website, you confirm that you are at least 18 years old and agree to be bound by these Terms. You are responsible for your interactions and content posted in comments. We reserve the right to remove objectionable content.</p>
+                
+                <h3>2. Content & Copyright Policy</h3>
+                <p>All original content is the exclusive property of GistNova. You may quote up to 50 words with attribution and a link back to the original article, but republication of full articles without consent is prohibited.</p>
+
+                <h3>3. Privacy Policy</h3>
+                <p>We collect Personal Data (like your newsletter email) and Usage Data (via analytics). Your email is used solely for the newsletter. We use cookies to enhance your browsing experience and track site activity.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+
+
+    <script src="assets/js/configuration.js"></script>
+    <script src="assets/js/home.js"></script>
+</body>
+</html>
