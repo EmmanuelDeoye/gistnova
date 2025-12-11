@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /**
-     * Renders the list of posts to the grid
+     * Renders the list of posts to the grid AND inserts ads
      */
     function renderPosts(posts) {
         blogGrid.innerHTML = ""; // Clear current grid
@@ -164,8 +164,15 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        posts.forEach(post => {
+        posts.forEach((post, index) => {
+            // 1. Create the Post Card
             createPostCard(post);
+
+            // 2. Insert Ad after every 3rd post (indexes 2, 5, 8...)
+            // logic: (index + 1) is divisible by 3
+            if ((index + 1) % 3 === 0) {
+                createAdCard();
+            }
         });
     }
 
@@ -206,6 +213,56 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
         blogGrid.appendChild(card);
+    }
+
+    /**
+     * Creates a Safe Frame Ad Card for Adsterra
+     */
+    function createAdCard() {
+        // Create wrapper div
+        const card = document.createElement("div");
+        card.className = "ad-card"; // Make sure to add this class in your CSS
+        
+        // Create iframe to isolate ad script
+        const iframe = document.createElement("iframe");
+        iframe.width = "300";
+        iframe.height = "250";
+        iframe.style.border = "none";
+        iframe.style.overflow = "hidden";
+        iframe.scrolling = "no";
+        
+        // The Adsterra Script content
+        const adHtml = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <style>body { margin: 0; display: flex; justify-content: center; align-items: center; background: transparent; }</style>
+            </head>
+            <body>
+                <script type="text/javascript">
+                    atOptions = { 
+                        'key' : '3b97e073d0dae7b3c52e27150c01a30a', 
+                        'format' : 'iframe', 
+                        'height' : 250, 
+                        'width' : 300, 
+                        'params' : {} 
+                    };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/3b97e073d0dae7b3c52e27150c01a30a/invoke.js"></script>
+            </body>
+            </html>
+        `;
+
+        // Append iframe to DOM first
+        card.appendChild(iframe);
+        blogGrid.appendChild(card);
+
+        // Write script into the iframe
+        const doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write(adHtml);
+        doc.close();
     }
 
 

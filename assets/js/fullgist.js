@@ -32,34 +32,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const articleView = document.getElementById("article-view");
 
     if (!postId) {
-        // No ID provided? Redirect home.
         window.location.href = "index.html";
     }
 
-    // ----------------------------------------------------------------------
-    // --- 3. Fetch Specific Post and Increment View Count (UPDATED BLOCK) ---
-    // ----------------------------------------------------------------------
-    
+    // --- 3. Fetch Specific Post ---
     const postRef = database.ref('blogPosts/' + postId);
-    
-    // NEW: Reference to the views counter for this specific post
     const viewCounterRef = database.ref('postViews/' + postId);
 
     postRef.once('value').then((snapshot) => {
         const post = snapshot.val();
 
         if (post) {
-            // NEW: Increment the view count by 1 (using transaction for safety)
-            // A transaction prevents race conditions if multiple users load the page simultaneously.
             viewCounterRef.transaction((currentViews) => {
-                // If the views are null (first view), set to 1. Otherwise, increment.
                 return (currentViews || 0) + 1;
             });
             
             renderFullPost(post);
             loadRelatedPosts(post.category, postId);
         } else {
-            // ID exists in URL but not in DB
             loader.style.display = "none";
             document.querySelector('main').innerHTML = "<h2 style='text-align:center; margin-top:50px'>Gist not found!</h2>";
         }
@@ -69,9 +59,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector('main').innerHTML = "<h2 style='text-align:center; margin-top:50px'>Error loading content.</h2>";
     });
 
-    // --- 4. Render Function with Rich Text Parser ---
+    // --- 4. Render Function with Ad Injection ---
     function renderFullPost(post) {
-        document.title = `${post.title} | GistHub`;
+        document.title = `${post.title} | GistNova`;
         
         document.getElementById("gist-title").textContent = post.title;
         document.getElementById("gist-category").textContent = post.category || "General";
@@ -91,11 +81,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.getElementById("gist-desc").textContent = post.description;
 
-        // --- THE PARSER (Handles bold, italic, quotes, and inline images) ---
+        // 1. Parse formatting (*bold*, etc.)
         const rawContent = post.content || "";
         const formattedContent = parseCustomText(rawContent);
         
-        document.getElementById("gist-content").innerHTML = formattedContent;
+        // 2. Inject Ad Placeholders into the text
+        const contentWithAds = injectAdPlaceholders(formattedContent);
+        
+        // 3. Render to DOM
+        document.getElementById("gist-content").innerHTML = contentWithAds;
+
+        // 4. Activate Ads (Fill the placeholders)
+        renderAdsInPlaceholders();
 
         // Share Button Logic
         const shareBtn = document.getElementById("share-btn");
@@ -107,7 +104,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     url: window.location.href
                 }).catch(console.error);
             } else {
-                // Fallback for desktop/unsupported
                 navigator.clipboard.writeText(window.location.href);
                 alert("Link copied to clipboard!");
             }
@@ -117,26 +113,92 @@ document.addEventListener("DOMContentLoaded", () => {
         articleView.style.display = "block";
     }
 
-    // --- 5. Custom Text Parser Helper ---
+    // --- 5. Custom Text Parser ---
     function parseCustomText(text) {
         let safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-        // Bold: *content* -> <strong>content</strong>
         safeText = safeText.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
-        
-        // Italics: #content# -> <em>content</em>
         safeText = safeText.replace(/#(.*?)#/g, '<em>$1</em>');
-        
-        // Quotes: %content% -> <blockquote class="custom-quote">content</blockquote>
         safeText = safeText.replace(/%(.*?)%/g, '<blockquote class="custom-quote">$1</blockquote>');
-
-        // Inline Images: {img:URL} -> <div...><img...></div>
         safeText = safeText.replace(/\{img:(.*?)\}/g, '<div class="inline-img-wrapper"><img src="$1" class="inline-img" loading="lazy" /></div>');
-
-        // Preserve Line Breaks (convert newlines to <br>)
+        
+        // Convert newlines to <br> for HTML rendering
         safeText = safeText.replace(/\n/g, '<br>');
 
         return safeText;
+    }
+
+    // --- NEW: Inject Ad Placeholders Logic ---
+    function injectAdPlaceholders(htmlContent) {
+        // Split content by <br> tags to count "paragraphs"
+        const paragraphs = htmlContent.split('<br>');
+        
+        // Don't show ads if content is too short (less than 6 lines)
+        if (paragraphs.length < 6) return htmlContent;
+
+        // Logic: How many ads?
+        // 6-15 lines = 2 ads
+        // 16-30 lines = 3 ads
+        // 30+ lines = 4 ads
+        let numAds = 2;
+        if (paragraphs.length > 15) numAds = 3;
+        if (paragraphs.length > 30) numAds = 4;
+
+        // Calculate spacing
+        const interval = Math.floor(paragraphs.length / (numAds + 1));
+
+        let newHtml = "";
+        let adsInserted = 0;
+
+        paragraphs.forEach((para, index) => {
+            newHtml += para + "<br>";
+
+            // Check if we should insert an ad placeholder here
+            // Ensure we don't insert immediately at the start (index > 2)
+            if (index > 2 && adsInserted < numAds) {
+                // If current index is a multiple of the interval
+                if ((index % interval === 0)) {
+                    newHtml += `<div class="in-content-ad" id="ad-spot-${adsInserted}"></div>`;
+                    adsInserted++;
+                }
+            }
+        });
+
+        return newHtml;
+    }
+
+    // --- NEW: Render Ads into Placeholders Safely ---
+    function renderAdsInPlaceholders() {
+        const adPlaceholders = document.querySelectorAll('.in-content-ad');
+        
+        adPlaceholders.forEach(placeholder => {
+            const iframe = document.createElement("iframe");
+            iframe.width = "300";
+            iframe.height = "250";
+            iframe.scrolling = "no";
+            
+            // Adsterra Script
+            const adScript = `
+                <body style="margin:0; padding:0; display:flex; justify-content:center; align-items:center;">
+                    <script type="text/javascript">
+                        atOptions = { 
+                            'key' : '3b97e073d0dae7b3c52e27150c01a30a', 
+                            'format' : 'iframe', 
+                            'height' : 250, 
+                            'width' : 300, 
+                            'params' : {} 
+                        };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/3b97e073d0dae7b3c52e27150c01a30a/invoke.js"></script>
+                </body>
+            `;
+
+            placeholder.appendChild(iframe);
+
+            const doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(adScript);
+            doc.close();
+        });
     }
 
     // --- 6. Related Gist Logic ---
@@ -148,16 +210,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if(!category) return;
 
         relatedCatName.textContent = category;
-        relatedGrid.innerHTML = ''; // Clear previous content
+        relatedGrid.innerHTML = ''; 
 
-        // Fetch all posts (or a limited number)
         database.ref('blogPosts').limitToLast(20).once('value', (snapshot) => {
             const data = snapshot.val();
             if(!data) return;
 
             const posts = Object.entries(data);
             
-            // Filter: Same Category AND Not Current Post
             const related = posts.filter(([key, post]) => {
                 return post.category === category && key !== currentId;
             });
@@ -165,7 +225,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (related.length > 0) {
                 relatedSection.style.display = "block";
                 
-                // Show max 3 posts
                 related.slice(0, 3).forEach(([key, post]) => {
                     const card = document.createElement("div");
                     card.className = "related-card";
