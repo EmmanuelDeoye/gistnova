@@ -59,10 +59,24 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector('main').innerHTML = "<h2 style='text-align:center; margin-top:50px'>Error loading content.</h2>";
     });
 
-    // --- 4. Render Function with Ad Injection ---
+    // --- 4. Render Function with Ad Injection & OG Tag Update ---
     function renderFullPost(post) {
         document.title = `${post.title} | GistNova`;
         
+        // --- START: Dynamic Open Graph (OG) Tag Update for Sharing ---
+        const postUrl = window.location.href;
+        // Use the post image, or a placeholder if 'post.img' is missing
+        const defaultOgImage = 'https://via.placeholder.com/1200x630?text=GistNova+Read+Now';
+        const imageUrl = post.img && post.img.trim() !== '' ? post.img : defaultOgImage;
+
+        // Update meta tags in the document head
+        document.getElementById("og-title").content = post.title;
+        document.getElementById("og-description").content = post.description;
+        document.getElementById("og-image").content = imageUrl;
+        document.getElementById("og-url").content = postUrl;
+        // --- END: Dynamic Open Graph (OG) Tag Update ---
+
+
         document.getElementById("gist-title").textContent = post.title;
         document.getElementById("gist-category").textContent = post.category || "General";
         
@@ -98,6 +112,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const shareBtn = document.getElementById("share-btn");
         shareBtn.onclick = () => {
             if (navigator.share) {
+                // The native share uses the document title, text, and URL, 
+                // which now reflect the dynamic post data.
                 navigator.share({
                     title: post.title,
                     text: post.description,
