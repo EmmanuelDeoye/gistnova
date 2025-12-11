@@ -471,3 +471,23 @@ footer {
     font-size: 1rem;
     color: var(--primary-color);
 }
+
+
+/* --- Ad Card Styling --- */
+.ad-card {
+    background-color: var(--card-bg); /* Matches your blog card bg */
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    min-height: 300px; /* Ensures it has height even while loading */
+    overflow: hidden;
+}
+
+.ad-card iframe {
+    border: none;
+    overflow: hidden;
+}
