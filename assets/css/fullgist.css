@@ -335,3 +335,25 @@ footer {
     border: none;
     overflow: hidden;
 }
+
+
+.video-embed {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    margin: 20px 0;
+}
+
+.video-embed iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+
+.twitter-embed {
+    margin: 20px auto;
+    max-width: 550px;
+}
