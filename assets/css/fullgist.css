@@ -357,3 +357,10 @@ footer {
     margin: 20px auto;
     max-width: 550px;
 }
+
+.related-card img {
+    width: 100%;
+    height: 200px;          /* fixed height */
+    object-fit: cover;      /* crop instead of stretch */
+    display: block;
+}
