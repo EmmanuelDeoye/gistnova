@@ -364,3 +364,58 @@ footer {
     object-fit: cover;      /* crop instead of stretch */
     display: block;
 }
+
+
+/* Add these styles to your existing CSS */
+
+/* Better image error handling */
+.inline-img {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    background-color: var(--secondary-color);
+    min-height: 100px;
+    object-fit: cover;
+}
+
+/* Twitter embed container */
+.twitter-embed {
+    margin: 30px 0;
+    display: flex;
+    justify-content: center;
+}
+
+/* Ensure video embeds work properly */
+.video-embed {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    margin: 30px 0;
+    background-color: var(--secondary-color);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.video-embed iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Read link styling */
+.read-link {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-top: 8px;
+}
+
+.related-content h4 {
+    margin-bottom: 8px;
+    font-size: 1rem;
+    line-height: 1.4;
+}
