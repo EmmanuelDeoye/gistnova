@@ -745,3 +745,70 @@ a.action-btn:hover {
         display: none !important;
     }
 }
+
+
+/* Simple, clean formatting guide */
+.formatting-box {
+    display: none;
+    background: var(--card-bg);
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
+}
+
+.formatting-box h4 {
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.format-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.format-item:last-child {
+    border-bottom: none;
+}
+
+.format-code {
+    background: var(--bg-color);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    min-width: 100px;
+}
+
+.format-item span {
+    color: var(--text-muted);
+}
+
+.format-item i {
+    color: var(--primary-color);
+    width: 20px;
+    text-align: center;
+}
+
+.quote-sample {
+    color: var(--text-muted);
+    font-style: italic;
+    padding-left: 8px;
+    border-left: 3px solid var(--primary-color);
+}
+
+@media screen and (max-width: 768px) {
+    .format-item {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .format-code {
+        min-width: auto;
+    }
+}
