@@ -19,12 +19,22 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
                 loginOverlay.style.display = "none";
                 adminPanel.style.display = "block";
-                loadPostsTable(); // Load the table immediately upon login
+                loadPostsTable();
             }, 300);
         } else {
             errorMsg.textContent = "Incorrect passcode!";
             passInput.value = "";
             passInput.style.borderColor = "red";
+            setTimeout(() => {
+                passInput.style.borderColor = "";
+            }, 1000);
+        }
+    });
+
+    // Allow Enter key to submit
+    passInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            loginBtn.click();
         }
     });
 
@@ -36,23 +46,19 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", () => {
             const targetId = button.getAttribute("data-target");
 
-            // Deactivate all
             tabButtons.forEach(btn => btn.classList.remove("active"));
             contentSections.forEach(sec => sec.style.display = "none");
 
-            // Activate current
             button.classList.add("active");
             document.getElementById(targetId).style.display = "block";
 
-            // If navigating to Manage, refresh the table
             if (targetId === 'manage-posts') {
                 loadPostsTable();
             }
         });
     });
 
-
-    // --- 3. IMAGE UPLOAD LOGIC ---
+    // --- 3. IMAGE UPLOAD LOGIC (Improved) ---
     const fileInput = document.getElementById("image-file");
     const statusText = document.getElementById("upload-status");
     const hiddenUrlInput = document.getElementById("final-image-url");
@@ -62,38 +68,52 @@ document.addEventListener("DOMContentLoaded", () => {
         const file = e.target.files[0];
         if (!file) return;
 
-        const fileName = Date.now() + "_" + file.name;
+        // Validate file type
+        if (!file.type.match('image.*')) {
+            alert('Please select an image file');
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image size should be less than 5MB');
+            return;
+        }
+
+        const fileName = Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9.]/g, '_');
         
-        // Use the initialized storage object from configuration.js
         const storageRef = firebase.storage().ref('blogImages/' + fileName);
         const uploadTask = storageRef.put(file);
 
-        statusText.textContent = "Uploading...";
-        statusText.style.color = "inherit"; // Reset color
+        statusText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        statusText.style.color = "inherit";
 
         uploadTask.on('state_changed', 
             (snapshot) => {
-                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                 progressFill.style.width = progress + "%";
             }, 
             (error) => {
                 console.error("Upload failed:", error);
-                statusText.textContent = "Error Uploading";
-                statusText.style.color = "red";
+                statusText.innerHTML = '<i class="fas fa-exclamation-circle"></i> Upload Failed';
+                statusText.style.color = "var(--danger)";
                 progressFill.style.width = "0%";
             }, 
             () => {
                 uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
                     hiddenUrlInput.value = downloadURL;
-                    statusText.textContent = "Upload Complete! 🟢";
-                    statusText.style.color = "green";
+                    statusText.innerHTML = '<i class="fas fa-check-circle"></i> Upload Complete!';
+                    statusText.style.color = "var(--success)";
                     statusText.style.fontWeight = "bold";
+                    
+                    // Show success animation
+                    progressFill.style.backgroundColor = "var(--success)";
                 });
             }
         );
     });
 
-    // --- 4. FORM SUBMISSION (Create/Edit Logic) ---
+    // --- 4. FORM SUBMISSION (Updated for fullgist.js) ---
     const form = document.getElementById("blog-form");
     const submitBtn = document.getElementById("submit-btn");
     const postIdToEditInput = document.getElementById("post-id-to-edit");
@@ -110,6 +130,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const content = document.getElementById("post-content").value;
         const imgUrl = hiddenUrlInput.value;
 
+        // Validate required fields
+        if (!title || !category || !desc || !content) {
+            alert('Please fill in all required fields');
+            return;
+        }
+
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
         submitBtn.disabled = true;
 
@@ -118,29 +144,33 @@ document.addEventListener("DOMContentLoaded", () => {
             category: category,
             description: desc,
             content: content,
-            img: imgUrl,
+            img: imgUrl || null,
+            lastModified: firebase.database.ServerValue.TIMESTAMP
         };
 
         let operationPromise;
 
         if (isEditing) {
-            // Update existing post
             operationPromise = postsRef.child(postId).update(postData);
         } else {
-            // Create new post
             postData.timestamp = firebase.database.ServerValue.TIMESTAMP;
             operationPromise = postsRef.push(postData);
         }
 
         operationPromise
         .then(() => {
-            alert(`Gist ${isEditing ? 'Updated' : 'Published'} Successfully!`);
+            alert(`✨ Gist ${isEditing ? 'Updated' : 'Published'} Successfully!`);
             resetForm();
-            loadPostsTable(); // Refresh table after action
+            loadPostsTable();
+            
+            // Switch to manage tab after successful operation
+            if (!isEditing) {
+                document.querySelector('.tab-btn[data-target="manage-posts"]').click();
+            }
         })
         .catch((error) => {
             alert("Error: " + error.message);
-            submitBtn.innerHTML = 'Try Again';
+            submitBtn.innerHTML = isEditing ? '<i class="fas fa-edit"></i> Update Gist' : '<i class="fas fa-paper-plane"></i> Publish Gist';
             submitBtn.disabled = false;
         });
     });
@@ -148,56 +178,60 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 5. EDIT/VIEW/DELETE FUNCTIONS ---
 
     window.editPost = function(postId) {
-        // 1. Switch to Create/Edit Form Tab
         document.querySelector('.tab-btn[data-target="create-post"]').click();
-        const sectionTitle = document.querySelector("#create-post .section-title");
-        sectionTitle.textContent = "Edit Existing Article";
         
-        // Change button style/text for editing
-        submitBtn.innerHTML = '<i class="fas fa-edit"></i> Update Gist';
+        const sectionTitle = document.querySelector("#create-post .section-title");
+        sectionTitle.textContent = "✏️ Edit Article";
+        sectionTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Article';
+        
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Gist';
         submitBtn.classList.add("edit-mode");
         form.classList.add("edit-mode");
 
-        // 2. Load Data
         postsRef.child(postId).once('value', (snapshot) => {
             const post = snapshot.val();
             if (post) {
-                // Populate the hidden ID field
                 postIdToEditInput.value = postId;
                 
-                // Populate Form Fields
-                document.getElementById("post-title").value = post.title;
-                document.getElementById("post-category").value = post.category;
-                document.getElementById("post-desc").value = post.description;
-                document.getElementById("post-content").value = post.content;
+                document.getElementById("post-title").value = post.title || '';
+                document.getElementById("post-category").value = post.category || 'Entertainment';
+                document.getElementById("post-desc").value = post.description || '';
+                document.getElementById("post-content").value = post.content || '';
                 
-                // Handle Image URL
-                hiddenUrlInput.value = post.img || "";
-                statusText.textContent = post.img ? 'Image Loaded (Edit to change)' : 'No Image';
-                statusText.style.color = post.img ? "blue" : "gray";
-                progressFill.style.width = "100%";
+                if (post.img) {
+                    hiddenUrlInput.value = post.img;
+                    statusText.innerHTML = '<i class="fas fa-check-circle"></i> Image Loaded';
+                    statusText.style.color = "var(--primary-color)";
+                    progressFill.style.width = "100%";
+                    progressFill.style.backgroundColor = "var(--primary-color)";
+                } else {
+                    statusText.textContent = 'No Image';
+                }
             }
         });
     }
 
     window.deletePost = function(postId) {
-        if (confirm("Are you sure you want to delete this post? This cannot be undone.")) {
-            // 1. Delete Post Data
+        if (confirm("🗑️ Are you sure you want to delete this post? This cannot be undone.")) {
+            const deleteBtn = event.target.closest('.delete-btn');
+            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            deleteBtn.disabled = true;
+
             postsRef.child(postId).remove()
             .then(() => {
-                // 2. Delete View Count (Optional cleanup)
                 viewsRef.child(postId).remove();
-                alert("Post successfully deleted! 🗑️");
-                loadPostsTable(); // Refresh the table
+                alert("✅ Post successfully deleted!");
+                loadPostsTable();
             })
             .catch((error) => {
                 alert("Error deleting post: " + error.message);
+                deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete';
+                deleteBtn.disabled = false;
             });
         }
     }
 
-
-    // --- 6. POSTS TABLE LOADING ---
+    // --- 6. POSTS TABLE LOADING (Updated) ---
 
     let allViewCounts = {};
 
@@ -212,53 +246,47 @@ document.addEventListener("DOMContentLoaded", () => {
         const loadingEl = document.getElementById("loading-posts");
         const tableEl = document.getElementById("posts-table");
         
-        // Ensure table headers match the new column count
-        const thead = tableEl.querySelector('thead tr');
-        thead.innerHTML = `
-            <th>Image</th>
-            <th>Title</th>
-            <th>Category</th>
-            <th>Date</th>
-            <th>Views</th>
-            <th>Actions</th>
-        `;
-        
         tbody.innerHTML = '';
         loadingEl.style.display = 'block';
         tableEl.style.display = 'none';
 
-        // Fetch views first, then fetch posts
         fetchViewCounts().then(() => {
-            postsRef.once('value', (snapshot) => {
+            postsRef.orderByChild('timestamp').once('value', (snapshot) => {
                 loadingEl.style.display = 'none';
                 const data = snapshot.val();
                 
                 if (!data) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No posts found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">📭 No posts found. Create your first gist!</td></tr>';
+                    tableEl.style.display = 'table';
                     return;
                 }
 
                 tableEl.style.display = 'table';
                 
-                // Convert object to array and reverse for newest first
                 const postsArray = Object.entries(data).reverse();
 
                 postsArray.forEach(([key, post]) => {
+                    if (!post) return;
+                    
                     const views = allViewCounts[key] || 0;
-                    const date = new Date(post.timestamp).toLocaleDateString();
-                    const imgUrl = post.img || 'https://via.placeholder.com/60x40?text=No+Img';
+                    const date = post.timestamp ? new Date(post.timestamp).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    }) : 'No date';
+                    
+                    const imgUrl = post.img || 'https://via.placeholder.com/80x60?text=No+Image';
                     
                     const row = tbody.insertRow();
                     
-                    // The data-label attributes are crucial for mobile responsiveness
                     row.innerHTML = `
                         <td data-label="Image">
-                            <img src="${imgUrl}" class="post-image" alt="Cover">
+                            <img src="${imgUrl}" class="post-image" alt="Cover" loading="lazy" onerror="this.src='https://via.placeholder.com/80x60?text=Error';">
                         </td>
-                        <td data-label="Title">${post.title}</td>
-                        <td data-label="Category">${post.category}</td>
+                        <td data-label="Title"><strong>${post.title || 'Untitled'}</strong></td>
+                        <td data-label="Category"><span style="background:var(--primary-soft); color:var(--primary-color); padding:4px 12px; border-radius:20px; font-size:0.85rem;">${post.category || 'General'}</span></td>
                         <td data-label="Date">${date}</td>
-                        <td data-label="Views">${views}</td>
+                        <td data-label="Views"><i class="far fa-eye"></i> ${views.toLocaleString()}</td>
                         <td data-label="Actions">
                             <button class="action-btn" onclick="editPost('${key}')" title="Edit Post">
                                 <i class="fas fa-pencil-alt"></i> Edit
@@ -282,22 +310,24 @@ document.addEventListener("DOMContentLoaded", () => {
         form.reset();
         postIdToEditInput.value = "";
         
-        // Reset button and titles
-        document.querySelector("#create-post .section-title").textContent = "Post a New Article";
+        document.querySelector("#create-post .section-title").innerHTML = '<i class="fas fa-plus-circle"></i> Post a New Article';
         submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Publish Gist';
         submitBtn.disabled = false;
         submitBtn.classList.remove("edit-mode");
         form.classList.remove("edit-mode");
 
-        // Reset image upload status
         hiddenUrlInput.value = "";
         progressFill.style.width = "0%";
-        statusText.textContent = "Select Image";
+        progressFill.style.backgroundColor = "";
+        statusText.innerHTML = '📷 Select Image';
         statusText.style.color = "inherit";
     }
 
     window.toggleHelp = function() {
         const guide = document.getElementById("formatting-guide");
-        guide.style.display = (guide.style.display === "block") ? "none" : "block";
+        guide.style.display = guide.style.display === "block" ? "none" : "block";
     }
+
+    // --- 8. Theme Toggle (Optional - Add if you want theme switcher in admin) ---
+    // You can add a theme toggle button similar to the main site
 });
