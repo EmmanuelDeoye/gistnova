@@ -23,12 +23,65 @@
         </div>
     </div>
 
-        <div id="admin-panel" class="container" style="display: none;">
+    <div id="admin-panel" class="container" style="display: none;">
         
         <header class="admin-header">
-            <h1>Gistnova <span class="highlight">Studio</span></h1>
-            <a href="index.html" target="_blank" class="view-site-btn">View Site <i class="fas fa-external-link-alt"></i></a>
+            <div class="header-left">
+                <h1>Gistnova <span class="highlight">Studio</span></h1>
+            </div>
+            <div class="header-right">
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+                <a href="index.html" target="_blank" class="view-site-btn">
+                    <i class="fas fa-external-link-alt"></i> View Site
+                </a>
+            </div>
         </header>
+
+        <!-- Dashboard Stats Section -->
+        <div class="dashboard-stats" id="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-value" id="total-posts">0</span>
+                    <span class="stat-label">Total Gists</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-value" id="total-views">0</span>
+                    <span class="stat-label">Total Views</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-value" id="avg-views">0</span>
+                    <span class="stat-label">Avg Views/Gist</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="stat-details">
+                    <span class="stat-value" id="last-posted">Never</span>
+                    <span class="stat-label">Last Posted</span>
+                </div>
+            </div>
+        </div>
 
         <div class="tabs">
             <button class="tab-btn active" data-target="create-post"><i class="fas fa-plus-circle"></i> Create New Gist</button>
@@ -37,8 +90,12 @@
 
         <div id="create-post" class="content-section active">
             <h2 class="section-title">Post a New Article</h2>
-            
+            <button type="button" id="clear-draft-icon" class="clear-draft-icon" title="Clear draft">
+            <i class="fas fa-trash-alt"></i>
+        </button>
             <form id="blog-form" class="blog-form">
+                
+                 
                 
                 <input type="hidden" id="post-id-to-edit" value="">
                 
@@ -82,65 +139,118 @@
                     </div>
                     
                     <div id="formatting-guide" class="formatting-box">
-    <h4 style="margin-bottom: 10px; color: var(--primary-color);">Quick Formatting Guide</h4>
-    
-    <div class="format-item">
-        <code class="format-code">*text*</code> <span>→</span> <strong>bold</strong>
-    </div>
-    
-    <div class="format-item">
-        <code class="format-code">#text#</code> <span>→</span> <em>italic</em>
-    </div>
-    
-    <div class="format-item">
-        <code class="format-code">%text%</code> <span>→</span> <span class="quote-sample">quote block</span>
-    </div>
-    
-    <div class="format-item">
-        <code class="format-code">{img:url}</code> <span>→</span> <i class="fas fa-image"></i> inline image
-    </div>
-    
-    <div class="format-item">
-        <code class="format-code">YouTube URL</code> <span>→</span> <i class="fab fa-youtube"></i> video embed
-    </div>
-    
-    <div class="format-item">
-        <code class="format-code">Twitter URL</code> <span>→</span> <i class="fab fa-twitter"></i> tweet embed
-    </div>
-</div>
+                        <h4 style="margin-bottom: 10px; color: var(--primary-color);">Quick Formatting Guide</h4>
+                        
+                        <div class="format-item">
+                            <code class="format-code">*text*</code> <span>→</span> <strong>bold</strong>
+                        </div>
+                        
+                        <div class="format-item">
+                            <code class="format-code">#text#</code> <span>→</span> <em>italic</em>
+                        </div>
+                        
+                        <div class="format-item">
+                            <code class="format-code">%text%</code> <span>→</span> <span class="quote-sample">quote block</span>
+                        </div>
+                        
+                        <div class="format-item">
+                            <code class="format-code">{img:url}</code> <span>→</span> <i class="fas fa-image"></i> inline image
+                        </div>
+                        
+                        <div class="format-item">
+                            <code class="format-code">YouTube URL</code> <span>→</span> <i class="fab fa-youtube"></i> video embed
+                        </div>
+                        
+                        <div class="format-item">
+                            <code class="format-code">Twitter URL</code> <span>→</span> <i class="fab fa-twitter"></i> tweet embed
+                        </div>
+                    </div>
     
                     <textarea id="post-content" rows="12" placeholder="Write the full gist here... Use *bold* for emphasis." required></textarea>
                 </div>
-    
+
+                <!-- Clear Draft Button -->
                 <button type="submit" id="submit-btn" class="submit-btn">
-                    <i class="fas fa-paper-plane"></i> Publish Gist
-                </button>
+            <i class="fas fa-paper-plane"></i> Publish Gist
+        </button>
     
             </form>
         </div>
         
         <div id="manage-posts" class="content-section" style="display: none;">
             <h2 class="section-title">Manage Existing Posts</h2>
+            
+            <!-- Search and Filter Section -->
+            <div class="search-filter-section">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="search-input" placeholder="Search by title or description...">
+                    <button id="clear-search" class="clear-btn" title="Clear search">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="filter-box">
+                    <select id="category-filter">
+                        <option value="all">All Categories</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Politics">Politics</option>
+                        <option value="Tech">Tech</option>
+                        <option value="Lifestyle">Lifestyle</option>
+                        <option value="Sports">Sports</option>
+                    </select>
+                    
+                    <select id="sort-filter">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="most-viewed">Most Viewed</option>
+                        <option value="least-viewed">Least Viewed</option>
+                        <option value="a-z">Title (A-Z)</option>
+                        <option value="z-a">Title (Z-A)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Results count -->
+            <div class="results-info">
+                <span id="results-count">Showing all posts</span>
+            </div>
+            
             <div id="posts-table-container">
                 <p id="loading-posts">Loading posts...</p>
                 <table class="post-table" id="posts-table" style="display: none;">
                     <thead>
                         <tr>
+                            <th>Image</th>
                             <th>Title</th>
                             <th>Category</th>
                             <th>Date</th>
                             <th>Views</th>
+                            <th>Comments</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="posts-tbody">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </div>
 
     </div>
 
+    <!-- Comment Management Modal -->
+    <div id="comment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-comments"></i> Manage Comments</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body" id="comment-modal-body">
+                <!-- Comments will be loaded here -->
+                <div class="loading-comments">Loading comments...</div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>

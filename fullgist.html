@@ -6,24 +6,21 @@
     <title>Reading Gist | GistNova</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="assets/css/fullgist.css">
 
     <meta property="og:title" id="og-title" content="GistNova - Loading...">
     <meta property="og:description" id="og-description" content="Read the latest gist on GistNova.">
     <meta name="twitter:card" content="summary_large_image">
     <meta property="og:image" id="og-image" content="https://via.placeholder.com/1200x630?text=GistNova+Read+Now">
-    <meta property="og:url" id="og-url" content="https://https://emmanueldeoye.github.io/gistnova/fullgist.html">
+    <meta property="og:url" id="og-url" content="https://emmanueldeoye.github.io/gistnova/fullgist.html">
     <meta property="og:type" content="article">
-
 </head>
 <body>
 
     <nav class="navbar">
         <div class="container nav-content">
-            <a href="index.html" class="logo">Gist<span class="highlight">Nova</span>.</a>
+            <a href="index.html" class="logo">Gist<span class="highlight">Nova</span></a>
             <div class="nav-controls">
                 <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
                 <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
@@ -33,7 +30,7 @@
         </div>
     </nav>
 
-        <main class="container article-container">
+    <main class="container article-container">
         
         <div id="loader" class="loader-container">
             <div class="spinner"></div>
@@ -63,16 +60,38 @@
                 <div id="gist-content" class="main-text"></div>
             </div>
 
+            <!-- ========== COMMENT SECTION ========== -->
+            <section id="comment-section" class="comment-section">
+                <h3 class="comment-heading">Comments</h3>
+                <div id="comment-list" class="comment-list">
+                    <!-- comments will be injected here -->
+                </div>
+                <div id="no-comments" class="no-comments" style="display: none;">No comments yet. Be the first to comment!</div>
+
+                <form id="comment-form" class="comment-form">
+                    <h4>Leave a comment</h4>
+                    <div class="form-row">
+                        <input type="text" id="comment-name" placeholder="Your name *" required>
+                    </div>
+                    <div class="form-row">
+                        <input type="email" id="comment-email" placeholder="Your email (optional)">
+                    </div>
+                    <div class="form-row">
+                        <textarea id="comment-text" placeholder="Your comment *" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-comment-btn">Post Comment</button>
+                </form>
+            </section>
+            <!-- ========== END COMMENT SECTION ========== -->
+
         </article>
 
         <section id="related-section" class="related-section" style="display: none;">
             <h3 class="related-heading">More from <span id="related-cat-name">this category</span></h3>
-            <div id="related-grid" class="related-grid">
-                </div>
+            <div id="related-grid" class="related-grid"></div>
         </section>
 
     </main>
-
 
     <footer>
         <p>&copy; 2025 GistNova. All rights reserved.</p>
@@ -89,6 +108,5 @@
     <script src="assets/js/configuration.js"></script>
     <script src="assets/js/fullgist.js"></script>
 
-    
 </body>
 </html>
