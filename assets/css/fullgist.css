@@ -85,7 +85,7 @@ body {
 
 /* --- Article Layout --- */
 .article-container {
-    max-width: 800px; /* Narrower width for better reading experience */
+    max-width: 800px;
     padding-top: 40px;
     padding-bottom: 80px;
     min-height: 80vh;
@@ -154,10 +154,10 @@ body {
 }
 
 .main-text {
-    font-family: 'Merriweather', serif; /* Serif font for long text */
+    font-family: 'Merriweather', serif;
     font-size: 1.1rem;
     line-height: 1.9;
-    white-space: pre-wrap; /* Preserves line breaks from database */
+    white-space: pre-wrap;
 }
 
 /* --- Loader --- */
@@ -192,7 +192,6 @@ footer {
     .article-header h1 { font-size: 1.8rem; }
     .main-text { font-size: 1rem; }
 }
-
 
 /* --- Meta Row & Share Button --- */
 .article-meta-row {
@@ -235,7 +234,6 @@ footer {
     color: var(--text-body);
 }
 
-/* The Quote Style (%content%) */
 .custom-quote {
     border-left: 4px solid var(--primary-color);
     background-color: var(--secondary-color);
@@ -247,7 +245,6 @@ footer {
     border-radius: 0 8px 8px 0;
 }
 
-/* Inline Images {img:url} */
 .inline-img-wrapper {
     margin: 30px 0;
     text-align: center;
@@ -282,7 +279,6 @@ footer {
     gap: 20px;
 }
 
-/* Reusing a mini version of the card style */
 .related-card {
     background: var(--bg-color);
     border: 1px solid var(--border-color);
@@ -318,7 +314,6 @@ footer {
     overflow: hidden;
 }
 
-
 /* --- In-Content Ads --- */
 .in-content-ad {
     display: flex;
@@ -335,7 +330,6 @@ footer {
     border: none;
     overflow: hidden;
 }
-
 
 .video-embed {
     position: relative;
@@ -360,15 +354,12 @@ footer {
 
 .related-card img {
     width: 100%;
-    height: 200px;          /* fixed height */
-    object-fit: cover;      /* crop instead of stretch */
+    height: 200px;
+    object-fit: cover;
     display: block;
 }
 
-
-/* Add these styles to your existing CSS */
-
-/* Better image error handling */
+/* --- Better image error handling --- */
 .inline-img {
     max-width: 100%;
     border-radius: 8px;
@@ -378,18 +369,16 @@ footer {
     object-fit: cover;
 }
 
-/* Twitter embed container */
 .twitter-embed {
     margin: 30px 0;
     display: flex;
     justify-content: center;
 }
 
-/* Ensure video embeds work properly */
 .video-embed {
     position: relative;
     width: 100%;
-    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    padding-top: 56.25%;
     margin: 30px 0;
     background-color: var(--secondary-color);
     border-radius: 12px;
@@ -405,7 +394,6 @@ footer {
     border: none;
 }
 
-/* Read link styling */
 .read-link {
     color: var(--primary-color);
     font-size: 0.9rem;
@@ -419,3 +407,146 @@ footer {
     font-size: 1rem;
     line-height: 1.4;
 }
+
+/* ========== COMMENT SECTION STYLES ========== */
+.comment-section {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.comment-heading {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: var(--text-main);
+}
+
+.comment-list {
+    margin-bottom: 30px;
+}
+
+.comment-item {
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.comment-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 70%;
+}
+
+.comment-author i {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.author-name {
+    font-weight: 600;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.95rem;
+}
+
+.comment-date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.comment-content {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-body);
+    margin-left: 32px; /* align with icon offset */
+    word-wrap: break-word;
+}
+
+.no-comments {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    margin: 20px 0;
+    font-size: 0.9rem;
+}
+
+.comment-form {
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.comment-form h4 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: var(--text-main);
+}
+
+.form-row {
+    margin-bottom: 15px;
+}
+
+.form-row input,
+.form-row textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+}
+
+.form-row input:focus,
+.form-row textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.submit-comment-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.submit-comment-btn:hover {
+    background-color: #00796b; /* darker shade */
+}
+
+/* Mobile adjustments for comments */
+@media (max-width: 600px) {
+    .comment-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .comment-author {
+        max-width: 100%;
+    }
+    .comment-content {
+        margin-left: 0;
+    }
+}
+
+
