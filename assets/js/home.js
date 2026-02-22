@@ -1,3 +1,5 @@
+// assets/js/home.js
+
 document.addEventListener("DOMContentLoaded", () => {
 
     // ==========================================
@@ -10,14 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const setTheme = (theme) => {
         document.documentElement.setAttribute("data-theme", theme);
         localStorage.setItem("theme", theme);
-
-        if (theme === "dark") {
-            themeIcon.classList.remove("fa-moon");
-            themeIcon.classList.add("fa-sun");
-        } else {
-            themeIcon.classList.remove("fa-sun");
-            themeIcon.classList.add("fa-moon");
-        }
+        themeIcon.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
     };
 
     const currentTheme = localStorage.getItem("theme");
@@ -33,29 +28,75 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // 2. Data Fetching & State Management
+    // 2. Caching Keys
+    // ==========================================
+    const STORAGE_POSTS_KEY = 'gistnova_home_posts';
+    const STORAGE_FILTERS_KEY = 'gistnova_home_filters';
+
+    // ==========================================
+    // 3. DOM Elements
     // ==========================================
     const blogGrid = document.getElementById("blog-grid");
     const loader = document.getElementById("loader");
-
     const searchInput = document.getElementById("search-input");
     const categorySelect = document.getElementById("category-filter");
     const sortSelect = document.getElementById("sort-filter");
 
     let allPosts = [];
 
-    const postsRef = database.ref("blogPosts");
+    // ==========================================
+    // 4. Load Cached Data (if any)
+    // ==========================================
+    let cachedPosts = null;
+    try {
+        const cached = sessionStorage.getItem(STORAGE_POSTS_KEY);
+        if (cached) {
+            cachedPosts = JSON.parse(cached);
+        }
+    } catch (e) {
+        console.warn("Failed to parse cached posts", e);
+    }
 
+    // Load cached filters and apply to inputs
+    try {
+        const filters = sessionStorage.getItem(STORAGE_FILTERS_KEY);
+        if (filters) {
+            const parsed = JSON.parse(filters);
+            if (parsed.search) searchInput.value = parsed.search;
+            if (parsed.category) categorySelect.value = parsed.category;
+            if (parsed.sort) sortSelect.value = parsed.sort;
+        }
+    } catch (e) {
+        console.warn("Failed to parse cached filters", e);
+    }
+
+    // If we have cached posts, render immediately and hide loader
+    if (cachedPosts && cachedPosts.length) {
+        loader.style.display = "none";
+        allPosts = cachedPosts;
+        populateCategories(allPosts);          // fill category dropdown from cache
+        filterAndRender();                      // render grid with current filters
+    }
+
+    // ==========================================
+    // 5. Firebase Listener (always runs, updates cache)
+    // ==========================================
+    const postsRef = database.ref("blogPosts");
     postsRef.on("value", (snapshot) => {
         const data = snapshot.val();
         loader.style.display = "none";
 
         if (data) {
-            allPosts = Object.entries(data).map(([key, value]) => ({
+            const newPosts = Object.entries(data).map(([key, value]) => ({
                 id: key,
                 ...value
             }));
 
+            // Save to sessionStorage for next visit
+            sessionStorage.setItem(STORAGE_POSTS_KEY, JSON.stringify(newPosts));
+
+            // Update global variable and re-render
+            allPosts = newPosts;
             populateCategories(allPosts);
             filterAndRender();
         } else {
@@ -72,15 +113,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // 3. Filter, Sort & Render Logic
+    // 6. Filter, Sort & Render
     // ==========================================
     function populateCategories(posts) {
         const categories = new Set();
-
         posts.forEach(post => {
             if (post.category) categories.add(post.category);
         });
 
+        // Preserve current selection if possible
+        const currentCategory = categorySelect.value;
         categorySelect.innerHTML = `<option value="all">All Categories</option>`;
 
         categories.forEach(cat => {
@@ -89,6 +131,11 @@ document.addEventListener("DOMContentLoaded", () => {
             option.textContent = cat;
             categorySelect.appendChild(option);
         });
+
+        // Restore selected category (if it still exists)
+        if (currentCategory && categories.has(currentCategory)) {
+            categorySelect.value = currentCategory;
+        }
     }
 
     function filterAndRender() {
@@ -99,11 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
         let filtered = allPosts.filter(post => {
             const titleMatch = (post.title || "").toLowerCase().includes(searchTerm);
             const descMatch = (post.description || "").toLowerCase().includes(searchTerm);
-            const textMatch = titleMatch || descMatch;
-
             const categoryMatch = categoryValue === "all" || post.category === categoryValue;
-
-            return textMatch && categoryMatch;
+            return (titleMatch || descMatch) && categoryMatch;
         });
 
         filtered.sort((a, b) => {
@@ -113,6 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         renderPosts(filtered);
+        saveFilters(); // save current filter state to sessionStorage
     }
 
     function renderPosts(posts) {
@@ -128,14 +173,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        posts.forEach(post => {
-            createPostCard(post);
-        });
+        posts.forEach(post => createPostCard(post));
     }
 
     function createPostCard(post) {
         const imageUrl = post.img || "https://via.placeholder.com/400x250?text=No+Image";
-
         const dateObj = new Date(parseInt(post.timestamp) || Date.now());
         const dateString = dateObj.toLocaleDateString("en-US", {
             month: "short",
@@ -145,10 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const card = document.createElement("article");
         card.className = "blog-card";
-
-        card.onclick = () => {
-            window.location.href = `fullgist.html?id=${post.id}`;
-        };
+        card.onclick = () => window.location.href = `fullgist.html?id=${post.id}`;
 
         card.innerHTML = `
             <div class="card-img-wrapper">
@@ -169,21 +208,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 4. Event Listeners
+    // 7. Save filter state to sessionStorage
+    // ==========================================
+    function saveFilters() {
+        const filters = {
+            search: searchInput.value,
+            category: categorySelect.value,
+            sort: sortSelect.value
+        };
+        sessionStorage.setItem(STORAGE_FILTERS_KEY, JSON.stringify(filters));
+    }
+
+    // ==========================================
+    // 8. Event Listeners for filters
     // ==========================================
     searchInput.addEventListener("input", filterAndRender);
     categorySelect.addEventListener("change", filterAndRender);
     sortSelect.addEventListener("change", filterAndRender);
 
     // ==========================================
-    // 5. Footer & Modals
+    // 9. Footer & Modals (unchanged)
     // ==========================================
     const aboutLink = document.getElementById("open-about");
     const termsLink = document.getElementById("open-terms");
-
     const aboutModal = document.getElementById("modal-about");
     const termsModal = document.getElementById("modal-terms");
-
     const closeButtons = document.querySelectorAll(".close-modal");
 
     if (aboutLink) {
@@ -192,28 +241,25 @@ document.addEventListener("DOMContentLoaded", () => {
             aboutModal.style.display = "block";
         });
     }
-
     if (termsLink) {
         termsLink.addEventListener("click", e => {
             e.preventDefault();
             termsModal.style.display = "block";
         });
     }
-
     closeButtons.forEach(btn => {
         btn.addEventListener("click", () => {
             aboutModal.style.display = "none";
             termsModal.style.display = "none";
         });
     });
-
     window.addEventListener("click", e => {
         if (e.target === aboutModal) aboutModal.style.display = "none";
         if (e.target === termsModal) termsModal.style.display = "none";
     });
 
     // ==========================================
-    // 6. Newsletter (UI only)
+    // 10. Newsletter (UI only)
     // ==========================================
     const newsletterForm = document.getElementById("newsletter-form");
     if (newsletterForm) {
@@ -226,5 +272,4 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
 });

@@ -62,6 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             renderFullPost(post);
             loadRelatedPosts(post.category, postId);
+            // Initialize comment section for this post
+            initComments(postId);
         })
         .catch(() => {
             loader.style.display = "none";
@@ -117,11 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const shareBtn = document.getElementById("share-btn");
         shareBtn.onclick = () => {
-            const shareText = `${post.title} - Read on GistNova`; // Use title instead of description
+            const shareText = `${post.title} - Read on GistNova`;
             if (navigator.share) {
                 navigator.share({
                     title: post.title,
-                    text: shareText, // Now using title-based text
+                    text: shareText,
                     url: postUrl
                 });
             } else {
@@ -135,130 +137,122 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
    /* ===============================
-   5. Content Parser + Media Embed (FIXED for your content format)
-=============================== */
-function parseCustomText(text) {
-    if (!text) return "";
+       5. Content Parser + Media Embed
+    =============================== */
+    function parseCustomText(text) {
+        if (!text) return "";
 
-    // First, escape HTML but preserve URLs
-    let html = text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        let html = text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
 
-    // Bold - *text*
-    html = html.replace(/\*(.*?)\*/g, "<strong>$1</strong>");
+        // Bold - *text*
+        html = html.replace(/\*(.*?)\*/g, "<strong>$1</strong>");
 
-    // Italic - #text# (but you're using this for "May her soul rest..." 
-    // So let's make it italic but not remove the # symbols visually
-    html = html.replace(/#(.*?)#/g, "<em>#$1#</em>"); // Keep the # symbols for your style
+        // Italic - #text# (keep # symbols)
+        html = html.replace(/#(.*?)#/g, "<em>#$1#</em>");
 
-    // Quote - %text% (multi-line support)
-    html = html.replace(/%([\s\S]*?)%/g, function(match, p1) {
-        return "<blockquote class='custom-quote'>" + p1.trim() + "</blockquote>";
-    });
+        // Quote - %text%
+        html = html.replace(/%([\s\S]*?)%/g, function(match, p1) {
+            return "<blockquote class='custom-quote'>" + p1.trim() + "</blockquote>";
+        });
 
-    // Inline Images - {img:url}
-    html = html.replace(/\{img:(.*?)\}/g, function(match, url) {
-        const imageUrl = url.trim();
-        if (imageUrl) {
-            // Check if it's a valid URL
-            if (imageUrl.startsWith('http')) {
+        // Inline Images - {img:url}
+        html = html.replace(/\{img:(.*?)\}/g, function(match, url) {
+            const imageUrl = url.trim();
+            if (imageUrl && imageUrl.startsWith('http')) {
                 return `<div class='inline-img-wrapper'><img src='${imageUrl}' class='inline-img' loading='lazy' alt='Blog image' onerror="this.onerror=null; this.src='https://via.placeholder.com/800x400?text=Image+Not+Found';"></div>`;
             }
-        }
-        return '';
-    });
+            return '';
+        });
 
-    // YouTube - FIXED: Handle URLs with parameters (like ?si=...)
-    html = html.replace(
-        /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]+)(?:\?[\w=&-]*)?/g,
-        function(match, videoId) {
-            if (videoId) {
-                return `<div class="video-embed">
-                    <iframe 
-                        src="https://www.youtube.com/embed/${videoId}"
-                        loading="lazy"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-                    </iframe>
-                </div>`;
-            }
-            return match;
-        }
-    );
-
-    // Vimeo
-    html = html.replace(
-        /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/g,
-        function(match, videoId) {
-            if (videoId) {
-                return `<div class="video-embed">
-                    <iframe 
-                        src="https://player.vimeo.com/video/${videoId}"
-                        loading="lazy"
-                        allowfullscreen>
-                    </iframe>
-                </div>`;
-            }
-            return match;
-        }
-    );
-
-    // Twitter / X
-    html = html.replace(
-        /(?:https?:\/\/)?(?:www\.)?(?:twitter\.com|x\.com)\/\w+\/status\/(\d+)/g,
-        function(match, statusId) {
-            if (statusId) {
-                return `<div class="twitter-embed">
-                    <blockquote class="twitter-tweet">
-                        <a href="${match}"></a>
-                    </blockquote>
-                </div>`;
-            }
-            return match;
-        }
-    );
-
-    // Convert line breaks to <br> but not inside already formatted blocks
-    // First, protect blockquotes and other HTML elements
-    let tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-    
-    // Process text nodes to replace newlines with <br>
-    function processTextNodes(node) {
-        if (node.nodeType === 3) { // Text node
-            if (node.textContent.includes('\n')) {
-                const lines = node.textContent.split('\n');
-                const fragment = document.createDocumentFragment();
-                for (let i = 0; i < lines.length; i++) {
-                    if (i > 0) {
-                        fragment.appendChild(document.createElement('br'));
-                    }
-                    if (lines[i]) {
-                        fragment.appendChild(document.createTextNode(lines[i]));
-                    }
+        // YouTube
+        html = html.replace(
+            /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]+)(?:\?[\w=&-]*)?/g,
+            function(match, videoId) {
+                if (videoId) {
+                    return `<div class="video-embed">
+                        <iframe 
+                            src="https://www.youtube.com/embed/${videoId}"
+                            loading="lazy"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>`;
                 }
-                node.parentNode.replaceChild(fragment, node);
+                return match;
             }
-        } else if (node.nodeType === 1) { // Element node
-            // Don't process inside certain elements
-            if (!['BLOCKQUOTE', 'SCRIPT', 'STYLE'].includes(node.tagName)) {
-                Array.from(node.childNodes).forEach(processTextNodes);
+        );
+
+        // Vimeo
+        html = html.replace(
+            /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/g,
+            function(match, videoId) {
+                if (videoId) {
+                    return `<div class="video-embed">
+                        <iframe 
+                            src="https://player.vimeo.com/video/${videoId}"
+                            loading="lazy"
+                            allowfullscreen>
+                        </iframe>
+                    </div>`;
+                }
+                return match;
+            }
+        );
+
+        // Twitter / X
+        html = html.replace(
+            /(?:https?:\/\/)?(?:www\.)?(?:twitter\.com|x\.com)\/\w+\/status\/(\d+)/g,
+            function(match, statusId) {
+                if (statusId) {
+                    return `<div class="twitter-embed">
+                        <blockquote class="twitter-tweet">
+                            <a href="${match}"></a>
+                        </blockquote>
+                    </div>`;
+                }
+                return match;
+            }
+        );
+
+        // Convert line breaks to <br> but not inside already formatted blocks
+        let tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        
+        function processTextNodes(node) {
+            if (node.nodeType === 3) { // Text node
+                if (node.textContent.includes('\n')) {
+                    const lines = node.textContent.split('\n');
+                    const fragment = document.createDocumentFragment();
+                    for (let i = 0; i < lines.length; i++) {
+                        if (i > 0) {
+                            fragment.appendChild(document.createElement('br'));
+                        }
+                        if (lines[i]) {
+                            fragment.appendChild(document.createTextNode(lines[i]));
+                        }
+                    }
+                    node.parentNode.replaceChild(fragment, node);
+                }
+            } else if (node.nodeType === 1) { // Element node
+                if (!['BLOCKQUOTE', 'SCRIPT', 'STYLE'].includes(node.tagName)) {
+                    Array.from(node.childNodes).forEach(processTextNodes);
+                }
             }
         }
+        
+        processTextNodes(tempDiv);
+        html = tempDiv.innerHTML;
+        
+        return html;
     }
-    
-    processTextNodes(tempDiv);
-    html = tempDiv.innerHTML;
-    
-    return html;
-}
 
     /* ===============================
-       6. Related Posts (FIXED)
+       6. Related Posts
     =============================== */
     function loadRelatedPosts(category, currentId) {
 
@@ -288,7 +282,7 @@ function parseCustomText(text) {
                         const timeB = b[1].timestamp || 0;
                         return timeB - timeA;
                     })
-                    .slice(0, 3);
+                    .slice(0, 4);
 
                 if (posts.length === 0) {
                     section.style.display = "none";
@@ -320,4 +314,130 @@ function parseCustomText(text) {
             });
     }
 
+    /* ===============================
+       7. COMMENT SECTION
+    =============================== */
+
+    let currentPostId = null;
+
+    function initComments(postId) {
+        currentPostId = postId;
+        loadComments(postId);
+        setupCommentForm(postId);
+    }
+
+    function loadComments(postId) {
+        const commentsRef = database.ref('comments/' + postId);
+        commentsRef.on('value', (snapshot) => {
+            const comments = snapshot.val();
+            renderComments(comments);
+        });
+    }
+
+    function renderComments(commentsObj) {
+        const listEl = document.getElementById('comment-list');
+        const noCommentsEl = document.getElementById('no-comments');
+        listEl.innerHTML = '';
+
+        if (!commentsObj) {
+            noCommentsEl.style.display = 'block';
+            return;
+        }
+
+        // Convert to array and sort by timestamp descending (newest first)
+        const commentsArray = Object.entries(commentsObj).map(([id, data]) => ({
+            id,
+            ...data
+        })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+        if (commentsArray.length === 0) {
+            noCommentsEl.style.display = 'block';
+            return;
+        }
+
+        noCommentsEl.style.display = 'none';
+
+        commentsArray.forEach(comment => {
+            const commentItem = document.createElement('div');
+            commentItem.className = 'comment-item';
+
+            // Format date
+            const date = comment.timestamp ? new Date(comment.timestamp) : new Date();
+            const dateStr = date.toLocaleDateString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            // Escape user input to prevent XSS
+            const author = escapeHtml(comment.name || 'Anonymous');
+            const content = escapeHtml(comment.comment || '').replace(/\n/g, '<br>');
+
+            commentItem.innerHTML = `
+                <div class="comment-header">
+                    <div class="comment-author">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="author-name" title="${author}">${author}</span>
+                    </div>
+                    <span class="comment-date">${dateStr}</span>
+                </div>
+                <div class="comment-content">${content}</div>
+            `;
+            listEl.appendChild(commentItem);
+        });
+    }
+
+    function setupCommentForm(postId) {
+        const form = document.getElementById('comment-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const nameInput = document.getElementById('comment-name');
+            const emailInput = document.getElementById('comment-email');
+            const commentInput = document.getElementById('comment-text');
+
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            const comment = commentInput.value.trim();
+
+            if (!name || !comment) {
+                alert('Please enter your name and comment.');
+                return;
+            }
+
+            // Basic email validation if provided
+            if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+                alert('Please enter a valid email address or leave it empty.');
+                return;
+            }
+
+            const newComment = {
+                name: name,
+                email: email || null,
+                comment: comment,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            const commentsRef = database.ref('comments/' + postId);
+            commentsRef.push(newComment)
+                .then(() => {
+                    // Clear form
+                    nameInput.value = '';
+                    emailInput.value = '';
+                    commentInput.value = '';
+                })
+                .catch((error) => {
+                    console.error('Error posting comment:', error);
+                    alert('Failed to post comment. Please try again.');
+                });
+        });
+    }
+
+    // Helper: escape HTML special characters
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 });
