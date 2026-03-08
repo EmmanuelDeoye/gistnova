@@ -550,3 +550,48 @@ footer {
 }
 
 
+/* --- Ad Containers --- */
+.in-content-ad {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0;
+    padding: 15px;
+    background-color: var(--secondary-color);
+    border-radius: 12px;
+    overflow: hidden;
+    min-height: 280px; /* Ensures space for 250px ad + padding */
+    border: 1px solid var(--border-color);
+}
+
+.in-content-ad iframe {
+    max-width: 100%;
+    border: none;
+    overflow: hidden;
+}
+
+/* Make ads responsive */
+@media (max-width: 768px) {
+    .in-content-ad {
+        margin: 20px 0;
+        padding: 10px;
+    }
+}
+
+/* Ad label (optional - for transparency) */
+.in-content-ad::before {
+    content: "Advertisement";
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+    z-index: 1;
+}
+
+.in-content-ad {
+    position: relative;
+    padding-top: 25px; /* Space for the "Advertisement" label */
+}
