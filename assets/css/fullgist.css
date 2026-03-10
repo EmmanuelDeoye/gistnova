@@ -40,30 +40,7 @@ body {
     padding: 0 20px;
 }
 
-/* --- Navbar --- */
-.navbar {
-    background-color: var(--bg-color);
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--border-color);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
 
-.nav-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo {
-    font-weight: 700;
-    font-size: 1.5rem;
-    color: var(--text-main);
-    text-decoration: none;
-}
-
-.logo .highlight { color: var(--primary-color); }
 
 .back-btn {
     text-decoration: none;
