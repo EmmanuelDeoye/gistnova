@@ -7,6 +7,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/home.css">
     <link rel="stylesheet" href="assets/css/fullgist.css">
 
     <meta property="og:title" id="og-title" content="GistNova - Loading...">
@@ -23,7 +24,14 @@
 
     <nav class="navbar">
         <div class="container nav-content">
-            <a href="index.html" class="logo">Gist<span class="highlight">Nova</span></a>
+            
+           
+            
+                <div class="brand">
+        <img src="assets/logo.png" alt="" class="brand-icon">
+        <h1 class="logo" style="display:none">Gist<span class="highlight">Nova</span></h1>
+    </div>
+    
             <div class="nav-controls">
                 <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
                 <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
@@ -61,35 +69,8 @@
                 <p id="gist-desc" class="lead-text"></p>
                 <hr class="divider">
                 
-                <!-- Adsterra Banner Ad - Top of content (after divider) -->
-                <div class="in-content-ad">
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key' : 'c85c2420668093d93348395bb707269f',
-                            'format' : 'iframe',
-                            'height' : 250,
-                            'width' : 300,
-                            'params' : {}
-                        };
-                    </script>
-                    <script type="text/javascript" src="https://www.highperformanceformat.com/c85c2420668093d93348395bb707269f/invoke.js" async></script>
-                </div>
-                
+                <!-- Content area where ads will be injected by JavaScript -->
                 <div id="gist-content" class="main-text"></div>
-                
-                <!-- Adsterra Banner Ad - Bottom of content (before comments) -->
-                <div class="in-content-ad">
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key' : 'c85c2420668093d93348395bb707269f',
-                            'format' : 'iframe',
-                            'height' : 250,
-                            'width' : 300,
-                            'params' : {}
-                        };
-                    </script>
-                    <script type="text/javascript" src="https://www.highperformanceformat.com/c85c2420668093d93348395bb707269f/invoke.js" async></script>
-                </div>
             </div>
 
             <!-- ========== COMMENT SECTION ========== -->
@@ -121,20 +102,7 @@
         <section id="related-section" class="related-section" style="display: none;">
             <h3 class="related-heading">More from <span id="related-cat-name">this category</span></h3>
             <div id="related-grid" class="related-grid"></div>
-            
-            <!-- Adsterra Banner Ad - Below related posts -->
-            <div class="in-content-ad" style="margin-top: 30px;">
-                <script type="text/javascript">
-                    atOptions = {
-                        'key' : 'c85c2420668093d93348395bb707269f',
-                        'format' : 'iframe',
-                        'height' : 250,
-                        'width' : 300,
-                        'params' : {}
-                    };
-                </script>
-                <script type="text/javascript" src="https://www.highperformanceformat.com/c85c2420668093d93348395bb707269f/invoke.js" async></script>
-            </div>
+            <!-- Ad will be injected here by JavaScript after related posts -->
         </section>
 
     </main>
